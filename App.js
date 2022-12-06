@@ -1,20 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import {Alert, StatusBar, View} from 'react-native';
+import {Post} from "./components/Post/Post";
+import React from "react";
+import {newsApi} from "./api/newsAPI";
+
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    const [data, setData] = React.useState([])
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    React.useEffect(() => {
+            newsApi.getNews()
+                .then((r) => setData(r.data))
+                .catch(err => {
+                    console.log(err)
+                    Alert.alert('Error', "Error response news")
+                })
+        },
+        [])
+    return (
+        <View>
+            {
+                data.map(el => {
+                    return <Post
+                        key={el.id}
+                        title={el.title}
+                        imageUrl={el.imageUrl}
+                        createdAt={el.createdAt}
+                    />
+                })
+            }
+            <Post/>
+            <StatusBar theme="auto"/>
+
+        </View>
+    );
+}
